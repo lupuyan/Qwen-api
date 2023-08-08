@@ -29,10 +29,14 @@ async def stream(
 ):
 
     async def event_generator(chat_history):
+        last_print_len = 0
         for resp in cli.stream_chat(
                 query=prompt, chat_history=chat_history, streaming=True
         ):
-            data = resp["result"]
+            data = resp["result"][last_print_len:]
+            if '�' == data or ' �' == data or '� ' == data:
+                continue
+            last_print_len = len(resp["result"])
             if await request.is_disconnected():
                 break
             yield {
